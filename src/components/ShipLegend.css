@@ -1,0 +1,138 @@
+.ship-legend {
+  background: linear-gradient(135deg, rgba(16, 16, 35, 0.9) 0%, rgba(10, 20, 46, 0.9) 100%);
+  border-radius: 5px;
+  border: 2px solid #0096ff;
+  padding: 20px;
+  box-shadow: 
+    0 0 30px rgba(0, 150, 255, 0.5),
+    inset 0 0 30px rgba(0, 255, 255, 0.1);
+  min-width: 250px;
+  position: relative;
+  z-index: 2;
+}
+
+.ship-legend h3 {
+  color: #ffffff;
+  margin-bottom: 20px;
+  font-size: 2rem;
+  text-align: center;
+  font-weight: bold;
+  text-shadow: 
+    0 0 10px rgba(255, 255, 255, 0.8),
+    0 0 20px rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 3px;
+}
+
+.ships-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.ship-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px;
+  background: linear-gradient(135deg, rgba(10, 10, 26, 0.7) 0%, rgba(10, 20, 46, 0.7) 100%);
+  border-radius: 3px;
+  transition: all 0.2s;
+  border: 2px solid #00ffff;
+  box-shadow: 
+    0 0 10px rgba(0, 255, 255, 0.3),
+    inset 0 0 10px rgba(0, 150, 255, 0.1);
+}
+
+.ship-item:hover {
+  transform: scale(1.05);
+  box-shadow: 
+    0 0 20px rgba(0, 255, 255, 0.6),
+    inset 0 0 20px rgba(0, 150, 255, 0.2);
+  border-color: #0096ff;
+}
+
+.ship-icon {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50px;
+}
+
+.ship-svg {
+  width: 100px;
+  height: 50px;
+  filter: drop-shadow(2px 2px 3px rgba(0, 0, 0, 0.3));
+}
+
+.ship-icon.carrier .ship-svg {
+  width: 110px;
+}
+
+.ship-icon.battleship .ship-svg {
+  width: 100px;
+}
+
+.ship-icon.cruiser .ship-svg {
+  width: 90px;
+}
+
+.ship-icon.submarine .ship-svg {
+  width: 95px;
+}
+
+.ship-icon.destroyer .ship-svg {
+  width: 80px;
+}
+
+.ship-details {
+  text-align: center;
+  width: 100%;
+}
+
+.ship-name {
+  font-weight: 700;
+  color: #00ffff;
+  font-size: 1rem;
+  margin-bottom: 6px;
+  text-shadow: 0 0 5px #00ffff;
+  letter-spacing: 1px;
+  font-family: 'Courier New', monospace;
+}
+
+.ship-size {
+  font-size: 0.9rem;
+  color: #0096ff;
+  font-weight: 700;
+  text-shadow: 0 0 5px #0096ff;
+  letter-spacing: 1px;
+  font-family: 'Courier New', monospace;
+}
+
+@media (max-width: 768px) {
+  .ship-legend {
+    min-width: auto;
+    width: 100%;
+  }
+
+  .ship-item {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .ship-icon {
+    width: auto;
+    height: 40px;
+  }
+
+  .ship-svg {
+    width: 70px !important;
+    height: 40px;
+  }
+
+  .ship-details {
+    text-align: right;
+  }
+}

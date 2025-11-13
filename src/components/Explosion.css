@@ -1,0 +1,190 @@
+.explosion-container {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.explosion {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  animation: explode 1s ease-out forwards;
+}
+
+.explosion-core {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 24px;
+  height: 24px;
+  background: radial-gradient(circle, #ff6b35 0%, #ff4500 50%, #dc143c 100%);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: core-burst 1s ease-out forwards;
+}
+
+.explosion-particle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: radial-gradient(circle, #ffa500 0%, #ff6347 100%);
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.particle-1 {
+  animation: particle-burst-1 1s ease-out forwards;
+}
+
+.particle-2 {
+  animation: particle-burst-2 1s ease-out forwards;
+}
+
+.particle-3 {
+  animation: particle-burst-3 1s ease-out forwards;
+}
+
+.particle-4 {
+  animation: particle-burst-4 1s ease-out forwards;
+}
+
+.particle-5 {
+  animation: particle-burst-5 1s ease-out forwards;
+}
+
+.particle-6 {
+  animation: particle-burst-6 1s ease-out forwards;
+}
+
+.particle-7 {
+  animation: particle-burst-7 1s ease-out forwards;
+}
+
+.particle-8 {
+  animation: particle-burst-8 1s ease-out forwards;
+}
+
+@keyframes explode {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  20% {
+    transform: scale(1.5);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes core-burst {
+  0% {
+    width: 8px;
+    height: 8px;
+    opacity: 1;
+  }
+  50% {
+    width: 36px;
+    height: 36px;
+    opacity: 1;
+  }
+  100% {
+    width: 12px;
+    height: 12px;
+    opacity: 0;
+  }
+}
+
+@keyframes particle-burst-1 {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-150%, -150%) scale(0.3);
+    opacity: 0;
+  }
+}
+
+@keyframes particle-burst-2 {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(50%, -150%) scale(0.3);
+    opacity: 0;
+  }
+}
+
+@keyframes particle-burst-3 {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(150%, -50%) scale(0.3);
+    opacity: 0;
+  }
+}
+
+@keyframes particle-burst-4 {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(150%, 50%) scale(0.3);
+    opacity: 0;
+  }
+}
+
+@keyframes particle-burst-5 {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(150%, 150%) scale(0.3);
+    opacity: 0;
+  }
+}
+
+@keyframes particle-burst-6 {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(50%, 150%) scale(0.3);
+    opacity: 0;
+  }
+}
+
+@keyframes particle-burst-7 {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, 150%) scale(0.3);
+    opacity: 0;
+  }
+}
+
+@keyframes particle-burst-8 {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-150%, 50%) scale(0.3);
+    opacity: 0;
+  }
+}

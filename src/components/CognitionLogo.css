@@ -1,0 +1,34 @@
+.cognition-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+  justify-content: center;
+}
+
+.cognition-icon {
+  flex-shrink: 0;
+}
+
+.cognition-text {
+  font-family: 'Courier New', 'Courier', monospace;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 2px;
+  line-height: 1;
+  text-shadow: 
+    0 0 10px rgba(255, 255, 255, 0.8),
+    0 0 20px rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+}
+
+@media (max-width: 768px) {
+  .cognition-text {
+    font-size: 1.5rem;
+  }
+  
+  .cognition-logo {
+    gap: 8px;
+  }
+}

@@ -1,0 +1,3 @@
+# Explosion Sound Effect
+# This is a placeholder - you would need to add an actual MP3 file here
+# For now, we'll use the Web Audio API to generate explosion sound

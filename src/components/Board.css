@@ -1,0 +1,178 @@
+.board-container-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.board-with-labels {
+  display: inline-block;
+}
+
+.axis-labels-top {
+  display: flex;
+  margin-bottom: 5px;
+}
+
+.axis-corner {
+  width: 30px;
+  height: 30px;
+}
+
+.axis-label-number {
+  width: 40px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+  color: #00ffff;
+  text-shadow: 0 0 5px #00ffff;
+  font-family: 'Courier New', monospace;
+}
+
+.board-with-letters {
+  display: flex;
+}
+
+.axis-labels-left {
+  display: flex;
+  flex-direction: column;
+  margin-right: 5px;
+}
+
+.axis-label-letter {
+  width: 30px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+  color: #00ffff;
+  text-shadow: 0 0 5px #00ffff;
+  font-family: 'Courier New', monospace;
+}
+
+.board {
+  position: relative;
+  display: inline-block;
+  border: 3px solid #00ffff;
+  background-color: #0a0a1a;
+  box-shadow: 
+    0 0 20px rgba(0, 255, 255, 0.5),
+    inset 0 0 30px rgba(0, 255, 255, 0.1);
+}
+
+.board-row {
+  display: flex;
+}
+
+.cell {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #1a4d4d;
+  background-color: #0f1f2e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 24px;
+  transition: all 0.2s;
+  box-shadow: inset 0 0 10px rgba(0, 150, 255, 0.2);
+}
+
+.cell.ship-cell {
+  background-color: #0a1a2e;
+  box-shadow: inset 0 0 15px rgba(0, 150, 255, 0.3);
+}
+
+.cell.ship {
+  background-color: #1a5a8e;
+}
+
+.ship-overlay,
+.ship-overlay-preview {
+  transition: all 0.1s ease;
+}
+
+.ship-svg-grid {
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.4));
+}
+
+.cell.hit {
+  background-color: #ff0066;
+  box-shadow: 
+    0 0 15px rgba(255, 0, 102, 0.8),
+    inset 0 0 15px rgba(255, 0, 102, 0.5);
+  animation: hitFlash 0.5s ease-out;
+}
+
+@keyframes hitFlash {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.cell.miss {
+  background-color: #001a33;
+  box-shadow: 
+    0 0 10px rgba(0, 100, 200, 0.5),
+    inset 0 0 10px rgba(0, 100, 200, 0.3);
+}
+
+.cell.highlight {
+  background-color: #ff6600;
+  opacity: 0.8;
+  box-shadow: 
+    0 0 15px rgba(255, 102, 0, 0.8),
+    inset 0 0 15px rgba(255, 102, 0, 0.5);
+  animation: highlightPulse 1s ease-in-out infinite;
+}
+
+@keyframes highlightPulse {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 0.5; }
+}
+
+.cell.clickable {
+  cursor: pointer;
+}
+
+.cell.clickable:hover {
+  background-color: #00ffff;
+  box-shadow: 
+    0 0 20px rgba(0, 255, 255, 0.8),
+    inset 0 0 20px rgba(0, 255, 255, 0.5);
+  transform: scale(1.05);
+}
+
+.board {
+  position: relative;
+}
+
+.hit-marker {
+  color: #ffff00;
+  text-shadow: 
+    0 0 10px #ffff00,
+    0 0 20px #ff0066;
+  font-weight: bold;
+  animation: markerGlow 1s ease-in-out infinite;
+}
+
+.miss-marker {
+  color: #00ffff;
+  text-shadow: 0 0 10px #00ffff;
+  font-weight: bold;
+}
+
+@keyframes markerGlow {
+  0%, 100% {
+    text-shadow: 
+      0 0 10px #ffff00,
+      0 0 20px #ff0066;
+  }
+  50% {
+    text-shadow: 
+      0 0 20px #ffff00,
+      0 0 30px #ff0066;
+  }
+}
