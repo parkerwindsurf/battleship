@@ -199,33 +199,7 @@ const getAdjacentCells = (pos: Position, board: Board): Position[] => {
   return adjacent;
 };
 
-const getDirectionalCells = (
-  pos: Position,
-  direction: 'horizontal' | 'vertical',
-  board: Board
-): Position[] => {
-  const cells: Position[] = [];
-  
-  if (direction === 'horizontal') {
-    // Check left and right
-    if (isValidCell(pos.row, pos.col - 1, board)) {
-      cells.push({ row: pos.row, col: pos.col - 1 });
-    }
-    if (isValidCell(pos.row, pos.col + 1, board)) {
-      cells.push({ row: pos.row, col: pos.col + 1 });
-    }
-  } else {
-    // Check up and down
-    if (isValidCell(pos.row - 1, pos.col, board)) {
-      cells.push({ row: pos.row - 1, col: pos.col });
-    }
-    if (isValidCell(pos.row + 1, pos.col, board)) {
-      cells.push({ row: pos.row + 1, col: pos.col });
-    }
-  }
-  
-  return cells;
-};
+// Removed unused getDirectionalCells function - logic is now inline in updateAIStateAfterShot
 
 const getCheckerboardCells = (board: Board): Position[] => {
   const cells: Position[] = [];
@@ -256,10 +230,32 @@ export const getSmartComputerMove = (
 ): { position: Position; newAIState: AIState } => {
   const newAIState = { ...aiState };
 
+  console.log('AI State:', {
+    mode: newAIState.mode,
+    targetQueueLength: newAIState.targetQueue.length,
+    hitStreakLength: newAIState.hitStreak.length,
+    direction: newAIState.direction
+  });
+
   // Target mode: we have hits to follow up on
   if (newAIState.mode === 'target' && newAIState.targetQueue.length > 0) {
-    const target = newAIState.targetQueue.shift()!;
-    return { position: target, newAIState };
+    // Filter out any invalid targets (already hit/missed)
+    const validTargets: Position[] = [];
+    for (const target of newAIState.targetQueue) {
+      if (isValidCell(target.row, target.col, board)) {
+        validTargets.push(target);
+      }
+    }
+    
+    console.log('Valid targets available:', validTargets.length);
+    
+    if (validTargets.length > 0) {
+      // Take the first valid target and update the queue
+      const target = validTargets[0];
+      newAIState.targetQueue = validTargets.slice(1);
+      console.log('AI targeting adjacent cell at:', target);
+      return { position: target, newAIState };
+    }
   }
 
   // If target queue is empty but we're in target mode, switch to hunt
@@ -302,10 +298,49 @@ export const updateAIStateAfterShot = (
   const newAIState = { ...aiState };
 
   if (!wasHit) {
+    // On a miss, if we have a direction, we might need to reverse
+    if (newAIState.direction && newAIState.hitStreak.length > 0) {
+      // Clear current target queue and rebuild from the other end
+      newAIState.targetQueue = [];
+      
+      // Add targets from the first hit in the opposite direction
+      const firstHit = newAIState.hitStreak[0];
+      const lastHit = newAIState.hitStreak[newAIState.hitStreak.length - 1];
+      
+      // If we were going right/down, now try left/up from the first hit
+      if (newAIState.direction === 'horizontal') {
+        // Try the opposite side of the ship
+        if (position.col > firstHit.col) {
+          // We were going right, now go left from first hit
+          if (isValidCell(firstHit.row, firstHit.col - 1, board)) {
+            newAIState.targetQueue.push({ row: firstHit.row, col: firstHit.col - 1 });
+          }
+        } else {
+          // We were going left, now go right from last hit
+          if (isValidCell(lastHit.row, lastHit.col + 1, board)) {
+            newAIState.targetQueue.push({ row: lastHit.row, col: lastHit.col + 1 });
+          }
+        }
+      } else if (newAIState.direction === 'vertical') {
+        // Try the opposite side of the ship
+        if (position.row > firstHit.row) {
+          // We were going down, now go up from first hit
+          if (isValidCell(firstHit.row - 1, firstHit.col, board)) {
+            newAIState.targetQueue.push({ row: firstHit.row - 1, col: firstHit.col });
+          }
+        } else {
+          // We were going up, now go down from last hit
+          if (isValidCell(lastHit.row + 1, lastHit.col, board)) {
+            newAIState.targetQueue.push({ row: lastHit.row + 1, col: lastHit.col });
+          }
+        }
+      }
+    }
     return newAIState;
   }
 
   // Hit! Switch to target mode
+  console.log('AI got a hit at:', position);
   newAIState.mode = 'target';
   newAIState.lastHit = position;
   newAIState.hitStreak.push(position);
@@ -322,37 +357,75 @@ export const updateAIStateAfterShot = (
     }
   }
 
-  // Add new targets based on direction
+  // Clear and rebuild target queue with proper priority
+  newAIState.targetQueue = [];
+
   if (newAIState.direction) {
-    // Continue in the known direction
-    const newTargets = getDirectionalCells(position, newAIState.direction, board);
+    // Continue in the known direction from the latest hit
+    const newTargets: Position[] = [];
     
-    // Also check from the first hit in the streak
-    if (newAIState.hitStreak.length > 0) {
-      const firstHit = newAIState.hitStreak[0];
-      const fromFirst = getDirectionalCells(firstHit, newAIState.direction, board);
-      newTargets.push(...fromFirst);
+    if (newAIState.direction === 'horizontal') {
+      // Try both directions from the latest hit
+      if (isValidCell(position.row, position.col + 1, board)) {
+        newTargets.push({ row: position.row, col: position.col + 1 });
+      }
+      if (isValidCell(position.row, position.col - 1, board)) {
+        newTargets.push({ row: position.row, col: position.col - 1 });
+      }
+      
+      // Also check from the ends of the hit streak
+      const minCol = Math.min(...newAIState.hitStreak.map(h => h.col));
+      const maxCol = Math.max(...newAIState.hitStreak.map(h => h.col));
+      if (isValidCell(position.row, minCol - 1, board)) {
+        newTargets.push({ row: position.row, col: minCol - 1 });
+      }
+      if (isValidCell(position.row, maxCol + 1, board)) {
+        newTargets.push({ row: position.row, col: maxCol + 1 });
+      }
+    } else {
+      // Vertical direction
+      if (isValidCell(position.row + 1, position.col, board)) {
+        newTargets.push({ row: position.row + 1, col: position.col });
+      }
+      if (isValidCell(position.row - 1, position.col, board)) {
+        newTargets.push({ row: position.row - 1, col: position.col });
+      }
+      
+      // Also check from the ends of the hit streak
+      const minRow = Math.min(...newAIState.hitStreak.map(h => h.row));
+      const maxRow = Math.max(...newAIState.hitStreak.map(h => h.row));
+      if (isValidCell(minRow - 1, position.col, board)) {
+        newTargets.push({ row: minRow - 1, col: position.col });
+      }
+      if (isValidCell(maxRow + 1, position.col, board)) {
+        newTargets.push({ row: maxRow + 1, col: position.col });
+      }
     }
     
-    // Remove duplicates and already queued targets
+    // Add unique targets only
     for (const target of newTargets) {
-      const alreadyQueued = newAIState.targetQueue.some(
+      const alreadyExists = newAIState.targetQueue.some(
         t => t.row === target.row && t.col === target.col
       );
-      if (!alreadyQueued) {
+      if (!alreadyExists) {
         newAIState.targetQueue.push(target);
       }
     }
   } else {
     // No direction yet, add all adjacent cells
     const adjacent = getAdjacentCells(position, board);
-    for (const adj of adjacent) {
-      const alreadyQueued = newAIState.targetQueue.some(
-        t => t.row === adj.row && t.col === adj.col
-      );
-      if (!alreadyQueued) {
-        newAIState.targetQueue.push(adj);
-      }
+    console.log('Adjacent cells to hit:', adjacent);
+    // Filter to ensure we only add valid cells
+    const validAdjacent = adjacent.filter(cell => 
+      board[cell.row][cell.col].status === 'empty' || 
+      board[cell.row][cell.col].status === 'ship'
+    );
+    newAIState.targetQueue = validAdjacent;
+    console.log('Added to target queue:', validAdjacent);
+    
+    // If no valid adjacent cells (shouldn't happen), stay in target mode
+    if (validAdjacent.length === 0 && newAIState.mode === 'target') {
+      console.warn('No valid adjacent cells found after hit at', position);
     }
   }
 

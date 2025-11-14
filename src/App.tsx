@@ -1,10 +1,10 @@
 import React, { useState, useCallback } from 'react';
+import './App.css';
 import { Board } from './components/Board';
 import { ShipLegend } from './components/ShipLegend';
 import { CognitionLogo } from './components/CognitionLogo';
-import { Explosion } from './components/Explosion';
-import { playExplosionSound } from './utils/soundEffects';
-import { GameState, Position } from './types';
+import { ShipDestroyedNotification } from './components/ShipDestroyedNotification';
+import { GameState } from './types';
 import {
   createEmptyBoard,
   SHIP_SIZES,
@@ -18,9 +18,17 @@ import {
   createAIState,
   checkGameOver,
 } from './gameLogic';
-import './App.css';
+import { playShipDestroyedSound } from './utils/soundEffects';
 
 const App: React.FC = () => {
+  // Enemy names array
+  const enemyNames = ['Cursor', 'Claude Code', 'CodeX', 'Github Copilot', 'Augment'];
+  
+  // Randomly select an enemy name for this game session
+  const getRandomEnemyName = () => {
+    return enemyNames[Math.floor(Math.random() * enemyNames.length)];
+  };
+
   const [gameState, setGameState] = useState<GameState>({
     phase: 'setup',
     playerBoard: createEmptyBoard(),
@@ -37,8 +45,24 @@ const App: React.FC = () => {
   });
 
   const [highlightCells, setHighlightCells] = useState<{ row: number; col: number }[]>([]);
-  const [playerExplosions, setPlayerExplosions] = useState<{ id: number; position: Position }[]>([]);
-  const [computerExplosions, setComputerExplosions] = useState<{ id: number; position: Position }[]>([]);
+  const [currentEnemyName, setCurrentEnemyName] = useState(getRandomEnemyName());
+  const [destroyedShipNotification, setDestroyedShipNotification] = useState<{
+    shipType: string;
+    isPlayer: boolean;
+  } | null>(null);
+
+  // Get ship type name based on size and ship ID
+  const getShipTypeName = (size: number, shipId?: number): string => {
+    switch (size) {
+      case 5: return 'Aircraft Carrier';
+      case 4: return 'Battleship';
+      case 3: 
+        // The third ship (index 2) is Cruiser, fourth ship (index 3) is Submarine
+        return (shipId === 2) ? 'Cruiser' : 'Submarine';
+      case 2: return 'Destroyer';
+      default: return 'Ship';
+    }
+  };
 
   // Convert coordinates to grid format (e.g., A5, J10)
   const coordinatesToGridFormat = (row: number, col: number): string => {
@@ -178,30 +202,6 @@ const App: React.FC = () => {
     setHighlightCells(positions);
   }, [gameState]);
 
-  const triggerExplosionForShip = (ship: { positions: Position[] }, isPlayerBoard: boolean) => {
-    playExplosionSound();
-    
-    // Create explosions for all positions of the ship
-    const newExplosions = ship.positions.map((pos, index) => ({
-      id: Date.now() + index,
-      position: pos
-    }));
-    
-    if (isPlayerBoard) {
-      setPlayerExplosions(prev => [...prev, ...newExplosions]);
-    } else {
-      setComputerExplosions(prev => [...prev, ...newExplosions]);
-    }
-  };
-
-  const removePlayerExplosion = (id: number) => {
-    setPlayerExplosions(prev => prev.filter(exp => exp.id !== id));
-  };
-
-  const removeComputerExplosion = (id: number) => {
-    setComputerExplosions(prev => prev.filter(exp => exp.id !== id));
-  };
-
   const startGame = () => {
     if (gameState.currentShipIndex < gameState.shipsToPlace.length) return;
 
@@ -240,7 +240,12 @@ const App: React.FC = () => {
     let message = shotResult.isHit ? `Hit at ${coords}!` : `Miss at ${coords}.`;
     if (shotResult.sunkShip) {
       message = `You sunk a ship of size ${shotResult.sunkShip.size} at ${coords}!`;
-      triggerExplosionForShip(shotResult.sunkShip, false); // Computer board
+      // Play sound and show notification for enemy ship destroyed
+      playShipDestroyedSound();
+      setDestroyedShipNotification({
+        shipType: getShipTypeName(shotResult.sunkShip.size, shotResult.sunkShip.id),
+        isPlayer: false
+      });
     }
 
     const gameOver = checkGameOver(shotResult.ships);
@@ -283,21 +288,134 @@ const App: React.FC = () => {
 
       const coords = coordinatesToGridFormat(move.row, move.col);
       let message = shotResult.isHit
-        ? `Computer hit your ship at ${coords}!`
-        : `Computer missed at ${coords}.`;
+        ? `Enemy hit your ship at ${coords}!`
+        : `Enemy missed at ${coords}.`;
 
       let updatedAIState = updateAIStateAfterShot(
         newAIState,
         move,
         shotResult.isHit,
-        prev.playerBoard
+        shotResult.board
       );
 
       if (shotResult.sunkShip) {
-        message = `Computer sunk your ship of size ${shotResult.sunkShip.size} at ${coords}!`;
-        triggerExplosionForShip(shotResult.sunkShip, true); // Player board
-        // Reset AI state after sinking a ship
-        updatedAIState = resetAIStateAfterSink();
+        message = `Enemy sunk your ship of size ${shotResult.sunkShip.size} at ${coords}!`;
+        // Play sound and show notification for player ship destroyed
+        playShipDestroyedSound();
+        setDestroyedShipNotification({
+          shipType: getShipTypeName(shotResult.sunkShip.size, shotResult.sunkShip.id),
+          isPlayer: true
+        });
+        
+        // After sinking a ship, check for any other existing hits that need to be targeted
+        const existingHits: {row: number; col: number}[] = [];
+        for (let row = 0; row < 10; row++) {
+          for (let col = 0; col < 10; col++) {
+            const cell = shotResult.board[row][col];
+            // Find hits that belong to ships that are not yet sunk
+            if (cell.status === 'hit' && cell.shipId !== undefined) {
+              const ship = shotResult.ships.find(s => s.id === cell.shipId);
+              if (ship && !ship.sunk) {
+                existingHits.push({row, col});
+              }
+            }
+          }
+        }
+        
+        // If there are other hits, stay in target mode and resume targeting
+        if (existingHits.length > 0) {
+          // Don't reset completely - preserve target mode and build new target queue
+          updatedAIState.mode = 'target';
+          updatedAIState.lastHit = existingHits[0];
+          updatedAIState.hitStreak = [existingHits[0]];
+          updatedAIState.direction = null; // Reset direction since we're starting fresh on a new ship
+          
+          // Add adjacent cells of ALL existing hits to target queue
+          const adjacentCells: {row: number; col: number}[] = [];
+          const directions = [
+            { row: -1, col: 0 }, { row: 1, col: 0 },
+            { row: 0, col: -1 }, { row: 0, col: 1 }
+          ];
+          
+          // Check if multiple hits form a line (same ship being partially hit)
+          if (existingHits.length >= 2) {
+            // Check if hits are aligned
+            const sameRow = existingHits.every(h => h.row === existingHits[0].row);
+            const sameCol = existingHits.every(h => h.col === existingHits[0].col);
+            
+            if (sameRow) {
+              updatedAIState.direction = 'horizontal';
+              updatedAIState.hitStreak = [...existingHits];
+              // Add cells at the ends of the line
+              const minCol = Math.min(...existingHits.map(h => h.col));
+              const maxCol = Math.max(...existingHits.map(h => h.col));
+              if (minCol > 0) {
+                const leftCell = shotResult.board[existingHits[0].row][minCol - 1];
+                if (leftCell.status === 'empty' || leftCell.status === 'ship') {
+                  adjacentCells.push({ row: existingHits[0].row, col: minCol - 1 });
+                }
+              }
+              if (maxCol < 9) {
+                const rightCell = shotResult.board[existingHits[0].row][maxCol + 1];
+                if (rightCell.status === 'empty' || rightCell.status === 'ship') {
+                  adjacentCells.push({ row: existingHits[0].row, col: maxCol + 1 });
+                }
+              }
+            } else if (sameCol) {
+              updatedAIState.direction = 'vertical';
+              updatedAIState.hitStreak = [...existingHits];
+              // Add cells at the ends of the line
+              const minRow = Math.min(...existingHits.map(h => h.row));
+              const maxRow = Math.max(...existingHits.map(h => h.row));
+              if (minRow > 0) {
+                const topCell = shotResult.board[minRow - 1][existingHits[0].col];
+                if (topCell.status === 'empty' || topCell.status === 'ship') {
+                  adjacentCells.push({ row: minRow - 1, col: existingHits[0].col });
+                }
+              }
+              if (maxRow < 9) {
+                const bottomCell = shotResult.board[maxRow + 1][existingHits[0].col];
+                if (bottomCell.status === 'empty' || bottomCell.status === 'ship') {
+                  adjacentCells.push({ row: maxRow + 1, col: existingHits[0].col });
+                }
+              }
+            } else {
+              // Hits are not aligned, add adjacent cells for all hits
+              for (const hit of existingHits) {
+                for (const dir of directions) {
+                  const newRow = hit.row + dir.row;
+                  const newCol = hit.col + dir.col;
+                  if (newRow >= 0 && newRow < 10 && newCol >= 0 && newCol < 10) {
+                    const targetCell = shotResult.board[newRow][newCol];
+                    if (targetCell.status === 'empty' || targetCell.status === 'ship') {
+                      // Check if not already in the list
+                      if (!adjacentCells.some(c => c.row === newRow && c.col === newCol)) {
+                        adjacentCells.push({ row: newRow, col: newCol });
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          } else {
+            // Only one existing hit, add its adjacent cells
+            for (const dir of directions) {
+              const newRow = existingHits[0].row + dir.row;
+              const newCol = existingHits[0].col + dir.col;
+              if (newRow >= 0 && newRow < 10 && newCol >= 0 && newCol < 10) {
+                const targetCell = shotResult.board[newRow][newCol];
+                if (targetCell.status === 'empty' || targetCell.status === 'ship') {
+                  adjacentCells.push({ row: newRow, col: newCol });
+                }
+              }
+            }
+          }
+          
+          updatedAIState.targetQueue = adjacentCells;
+        } else {
+          // No other hits found, fully reset to hunt mode
+          updatedAIState = resetAIStateAfterSink();
+        }
       }
 
       const gameOver = checkGameOver(shotResult.ships);
@@ -309,7 +427,7 @@ const App: React.FC = () => {
           playerShips: shotResult.ships,
           phase: 'gameover',
           winner: 'computer',
-          message: '💥 Game Over! Computer won.',
+          message: '💥 Game Over! Enemy won.',
           aiState: updatedAIState,
         };
       }
@@ -326,6 +444,9 @@ const App: React.FC = () => {
   };
 
   const resetGame = () => {
+    // Select a new random enemy for the new game
+    setCurrentEnemyName(getRandomEnemyName());
+    
     setGameState({
       phase: 'setup',
       playerBoard: createEmptyBoard(),
@@ -345,7 +466,7 @@ const App: React.FC = () => {
 
   return (
     <div className="app">
-      <h1>⚓ Battleship</h1>
+      <h1>⚓ Battleship ⚓</h1>
       
       <div className="game-info">
         <p className="message">{gameState.message}</p>
@@ -392,21 +513,19 @@ const App: React.FC = () => {
                 highlightShipId={gameState.currentShipIndex}
                 highlightOrientation={gameState.shipOrientation}
               />
-              {playerExplosions.map(explosion => (
-                <Explosion
-                  key={explosion.id}
-                  position={explosion.position}
-                  onComplete={() => removePlayerExplosion(explosion.id)}
-                />
-              ))}
             </div>
             <div className="ship-info">
-              Ships: {gameState.playerShips.filter(s => !s.sunk).length} / {gameState.playerShips.length}
+              Ships: {gameState.phase === 'setup' 
+                ? `${gameState.playerShips.length} / ${SHIP_SIZES.length}`
+                : `${gameState.playerShips.filter(s => !s.sunk).length} / ${gameState.playerShips.length}`
+              }
             </div>
           </div>
 
         <div className="board-wrapper">
-          <h2>Enemy Waters</h2>
+          <h2 className={`enemy-name enemy-${currentEnemyName.toLowerCase().replace(/\s+/g, '-')}`}>
+            {currentEnemyName}
+          </h2>
           <div className="board-container-wrapper">
             <Board
               board={gameState.computerBoard}
@@ -415,13 +534,6 @@ const App: React.FC = () => {
               onCellClick={handleComputerBoardClick}
               ships={gameState.computerShips}
             />
-            {computerExplosions.map(explosion => (
-              <Explosion
-                key={explosion.id}
-                position={explosion.position}
-                onComplete={() => removeComputerExplosion(explosion.id)}
-              />
-            ))}
           </div>
           <div className="ship-info">
             Ships: {gameState.computerShips.filter(s => !s.sunk).length} / {gameState.computerShips.length}
@@ -440,6 +552,14 @@ const App: React.FC = () => {
             </button>
           </div>
         </div>
+      )}
+
+      {destroyedShipNotification && (
+        <ShipDestroyedNotification
+          shipType={destroyedShipNotification.shipType}
+          isPlayer={destroyedShipNotification.isPlayer}
+          onComplete={() => setDestroyedShipNotification(null)}
+        />
       )}
     </div>
   );

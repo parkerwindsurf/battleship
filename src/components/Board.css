@@ -1,10 +1,12 @@
 .board-container-wrapper {
   position: relative;
   display: inline-block;
+  overflow: visible;
 }
 
 .board-with-labels {
   display: inline-block;
+  overflow: visible;
 }
 
 .axis-labels-top {
@@ -32,6 +34,7 @@
 
 .board-with-letters {
   display: flex;
+  overflow: visible;
 }
 
 .axis-labels-left {
@@ -61,10 +64,12 @@
   box-shadow: 
     0 0 20px rgba(0, 255, 255, 0.5),
     inset 0 0 30px rgba(0, 255, 255, 0.1);
+  overflow: visible;
 }
 
 .board-row {
   display: flex;
+  overflow: visible;
 }
 
 .cell {
@@ -78,6 +83,8 @@
   font-weight: bold;
   font-size: 24px;
   transition: all 0.2s;
+  position: relative;
+  z-index: 1;
   box-shadow: inset 0 0 10px rgba(0, 150, 255, 0.2);
 }
 
@@ -138,15 +145,11 @@
 }
 
 .cell.clickable:hover {
-  background-color: #00ffff;
   box-shadow: 
-    0 0 20px rgba(0, 255, 255, 0.8),
-    inset 0 0 20px rgba(0, 255, 255, 0.5);
-  transform: scale(1.05);
-}
-
-.board {
-  position: relative;
+    0 0 20px rgba(255, 0, 0, 1),
+    0 0 30px rgba(255, 0, 0, 0.8),
+    inset 0 0 20px rgba(255, 0, 0, 0.6);
+  z-index: 10;
 }
 
 .hit-marker {
