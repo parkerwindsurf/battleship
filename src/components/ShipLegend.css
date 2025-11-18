@@ -1,18 +1,27 @@
 .ship-legend {
   background: linear-gradient(135deg, rgba(16, 16, 35, 0.9) 0%, rgba(10, 20, 46, 0.9) 100%);
   border-radius: 5px;
-  border: 2px solid #0096ff;
+  border: 2px solid var(--frame-border);
   padding: 20px;
-  box-shadow: 
-    0 0 30px rgba(0, 150, 255, 0.5),
-    inset 0 0 30px rgba(0, 255, 255, 0.1);
   min-width: 250px;
   position: relative;
   z-index: 2;
 }
 
+.theme-default .ship-legend {
+  box-shadow: 
+    0 0 30px rgba(0, 150, 255, 0.5),
+    inset 0 0 30px rgba(0, 255, 255, 0.1);
+}
+
+.theme-cb .ship-legend {
+  box-shadow: 
+    0 0 30px rgba(123, 97, 255, 0.5),
+    inset 0 0 30px rgba(255, 191, 0, 0.1);
+}
+
 .ship-legend h3 {
-  color: #ffffff;
+  color: var(--text-white);
   margin-bottom: 20px;
   font-size: 2rem;
   text-align: center;
@@ -38,18 +47,36 @@
   background: linear-gradient(135deg, rgba(10, 10, 26, 0.7) 0%, rgba(10, 20, 46, 0.7) 100%);
   border-radius: 3px;
   transition: all 0.2s;
-  border: 2px solid #00ffff;
+  border: 2px solid var(--board-border);
+}
+
+.theme-default .ship-item {
   box-shadow: 
     0 0 10px rgba(0, 255, 255, 0.3),
     inset 0 0 10px rgba(0, 150, 255, 0.1);
 }
 
+.theme-cb .ship-item {
+  box-shadow: 
+    0 0 10px rgba(255, 191, 0, 0.3),
+    inset 0 0 10px rgba(123, 97, 255, 0.1);
+}
+
 .ship-item:hover {
   transform: scale(1.05);
+  border-color: var(--frame-border);
+}
+
+.theme-default .ship-item:hover {
   box-shadow: 
     0 0 20px rgba(0, 255, 255, 0.6),
     inset 0 0 20px rgba(0, 150, 255, 0.2);
-  border-color: #0096ff;
+}
+
+.theme-cb .ship-item:hover {
+  box-shadow: 
+    0 0 20px rgba(255, 191, 0, 0.6),
+    inset 0 0 20px rgba(123, 97, 255, 0.2);
 }
 
 .ship-icon {
@@ -93,19 +120,19 @@
 
 .ship-name {
   font-weight: 700;
-  color: #00ffff;
+  color: var(--text-primary);
   font-size: 1rem;
   margin-bottom: 6px;
-  text-shadow: 0 0 5px #00ffff;
+  text-shadow: 0 0 5px var(--text-primary);
   letter-spacing: 1px;
   font-family: 'Courier New', monospace;
 }
 
 .ship-size {
   font-size: 0.9rem;
-  color: #0096ff;
+  color: var(--text-secondary);
   font-weight: 700;
-  text-shadow: 0 0 5px #0096ff;
+  text-shadow: 0 0 5px var(--text-secondary);
   letter-spacing: 1px;
   font-family: 'Courier New', monospace;
 }

@@ -466,7 +466,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="app">
+    <div className={`app ${isColorBlindMode ? 'theme-cb' : 'theme-default'}`}>
       <button 
         className="colorblind-toggle"
         onClick={() => setIsColorBlindMode(!isColorBlindMode)}

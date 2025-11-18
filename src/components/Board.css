@@ -27,8 +27,8 @@
   justify-content: center;
   font-weight: 700;
   font-size: 1rem;
-  color: #00ffff;
-  text-shadow: 0 0 5px #00ffff;
+  color: var(--board-border);
+  text-shadow: 0 0 5px var(--board-border);
   font-family: 'Courier New', monospace;
 }
 
@@ -51,20 +51,29 @@
   justify-content: center;
   font-weight: 700;
   font-size: 1rem;
-  color: #00ffff;
-  text-shadow: 0 0 5px #00ffff;
+  color: var(--board-border);
+  text-shadow: 0 0 5px var(--board-border);
   font-family: 'Courier New', monospace;
 }
 
 .board {
   position: relative;
   display: inline-block;
-  border: 3px solid #00ffff;
+  border: 3px solid var(--board-border);
   background-color: #0a0a1a;
+  overflow: visible;
+}
+
+.theme-default .board {
   box-shadow: 
     0 0 20px rgba(0, 255, 255, 0.5),
     inset 0 0 30px rgba(0, 255, 255, 0.1);
-  overflow: visible;
+}
+
+.theme-cb .board {
+  box-shadow: 
+    0 0 20px rgba(255, 191, 0, 0.5),
+    inset 0 0 30px rgba(255, 191, 0, 0.1);
 }
 
 .board-row {
@@ -75,8 +84,8 @@
 .cell {
   width: 40px;
   height: 40px;
-  border: 1px solid #1a4d4d;
-  background-color: #0f1f2e;
+  border: 1px solid var(--grid-line);
+  background-color: var(--cell-bg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -85,12 +94,26 @@
   transition: all 0.2s;
   position: relative;
   z-index: 1;
+}
+
+.theme-default .cell {
   box-shadow: inset 0 0 10px rgba(0, 150, 255, 0.2);
 }
 
+.theme-cb .cell {
+  box-shadow: inset 0 0 10px rgba(123, 97, 255, 0.2);
+}
+
 .cell.ship-cell {
-  background-color: #0a1a2e;
+  background-color: var(--cell-ship);
+}
+
+.theme-default .cell.ship-cell {
   box-shadow: inset 0 0 15px rgba(0, 150, 255, 0.3);
+}
+
+.theme-cb .cell.ship-cell {
+  box-shadow: inset 0 0 15px rgba(123, 97, 255, 0.3);
 }
 
 .cell.ship {
@@ -153,12 +176,21 @@
 }
 
 .cell.highlight {
-  background-color: #ff6600;
+  background-color: var(--preview-highlight);
   opacity: 0.8;
+  animation: highlightPulse 1s ease-in-out infinite;
+}
+
+.theme-default .cell.highlight {
   box-shadow: 
     0 0 15px rgba(255, 102, 0, 0.8),
     inset 0 0 15px rgba(255, 102, 0, 0.5);
-  animation: highlightPulse 1s ease-in-out infinite;
+}
+
+.theme-cb .cell.highlight {
+  box-shadow: 
+    0 0 15px rgba(179, 125, 255, 0.8),
+    inset 0 0 15px rgba(179, 125, 255, 0.5);
 }
 
 @keyframes highlightPulse {
@@ -170,11 +202,19 @@
   cursor: pointer;
 }
 
-.cell.clickable:hover {
+.theme-default .cell.clickable:hover {
   box-shadow: 
     0 0 20px rgba(255, 0, 0, 1),
     0 0 30px rgba(255, 0, 0, 0.8),
     inset 0 0 20px rgba(255, 0, 0, 0.6);
+  z-index: 10;
+}
+
+.theme-cb .cell.clickable:hover {
+  box-shadow: 
+    0 0 20px var(--hover-target),
+    0 0 30px rgba(179, 125, 255, 0.8),
+    inset 0 0 20px rgba(179, 125, 255, 0.6);
   z-index: 10;
 }
 
@@ -188,8 +228,8 @@
 }
 
 .miss-marker {
-  color: #00ffff;
-  text-shadow: 0 0 10px #00ffff;
+  color: var(--text-primary);
+  text-shadow: 0 0 10px var(--text-primary);
   font-weight: bold;
 }
 
