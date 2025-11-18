@@ -126,6 +126,32 @@
     inset 0 0 10px rgba(0, 100, 200, 0.3);
 }
 
+/* Colorblind mode uses patterns + high contrast colors */
+.cell.hit-colorblind {
+  background-color: #0066cc;
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 5px,
+    rgba(255, 255, 255, 0.3) 5px,
+    rgba(255, 255, 255, 0.3) 10px
+  );
+  box-shadow: 0 0 15px rgba(0, 102, 204, 0.8);
+  animation: hitFlash 0.5s ease-out;
+}
+
+.cell.miss-colorblind {
+  background-color: #ffaa00;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 5px,
+    rgba(0, 0, 0, 0.2) 5px,
+    rgba(0, 0, 0, 0.2) 10px
+  );
+  box-shadow: 0 0 10px rgba(255, 170, 0, 0.8);
+}
+
 .cell.highlight {
   background-color: #ff6600;
   opacity: 0.8;
@@ -164,6 +190,21 @@
 .miss-marker {
   color: #00ffff;
   text-shadow: 0 0 10px #00ffff;
+  font-weight: bold;
+}
+
+.hit-marker-colorblind {
+  color: #ffffff;
+  text-shadow: 
+    0 0 10px #ffffff,
+    0 0 20px #0066cc;
+  font-weight: bold;
+  animation: markerGlow 1s ease-in-out infinite;
+}
+
+.miss-marker-colorblind {
+  color: #000000;
+  text-shadow: 0 0 10px #ffaa00;
   font-weight: bold;
 }
 

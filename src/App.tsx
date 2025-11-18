@@ -50,6 +50,7 @@ const App: React.FC = () => {
     shipType: string;
     isPlayer: boolean;
   } | null>(null);
+  const [isColorBlindMode, setIsColorBlindMode] = useState(false);
 
   // Get ship type name based on size and ship ID
   const getShipTypeName = (size: number, shipId?: number): string => {
@@ -466,6 +467,13 @@ const App: React.FC = () => {
 
   return (
     <div className="app">
+      <button 
+        className="colorblind-toggle"
+        onClick={() => setIsColorBlindMode(!isColorBlindMode)}
+        aria-label="Toggle colorblind mode"
+      >
+        {isColorBlindMode ? '🎨' : '👁️'}
+      </button>
       <h1>⚓ Battleship ⚓</h1>
       
       <div className="game-info">
@@ -512,6 +520,7 @@ const App: React.FC = () => {
                 highlightShipSize={gameState.phase === 'setup' ? gameState.shipsToPlace[gameState.currentShipIndex] : undefined}
                 highlightShipId={gameState.currentShipIndex}
                 highlightOrientation={gameState.shipOrientation}
+                isColorBlindMode={isColorBlindMode}
               />
             </div>
             <div className="ship-info">
@@ -533,6 +542,7 @@ const App: React.FC = () => {
               gamePhase={gameState.phase}
               onCellClick={handleComputerBoardClick}
               ships={gameState.computerShips}
+              isColorBlindMode={isColorBlindMode}
             />
           </div>
           <div className="ship-info">
