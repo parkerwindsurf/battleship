@@ -15,6 +15,7 @@ interface BoardProps {
   highlightShipSize?: number;
   highlightShipId?: number;
   highlightOrientation?: 'horizontal' | 'vertical';
+  isColorBlindMode?: boolean;
 }
 
 export const Board: React.FC<BoardProps> = ({
@@ -29,15 +30,16 @@ export const Board: React.FC<BoardProps> = ({
   highlightShipSize,
   highlightShipId,
   highlightOrientation,
+  isColorBlindMode = false,
 }) => {
   const getCellClass = (row: number, col: number) => {
     const cell = board[row][col];
     const classes = ['cell'];
 
     if (cell.status === 'hit') {
-      classes.push('hit');
+      classes.push(isColorBlindMode ? 'hit-colorblind' : 'hit');
     } else if (cell.status === 'miss') {
-      classes.push('miss');
+      classes.push(isColorBlindMode ? 'miss-colorblind' : 'miss');
     } else if (cell.status === 'ship' && isPlayerBoard) {
       // Ship cells are transparent now, ship icon renders on top
       classes.push('ship-cell');
@@ -61,9 +63,13 @@ export const Board: React.FC<BoardProps> = ({
   const getCellContent = (row: number, col: number) => {
     const cell = board[row][col];
     if (cell.status === 'hit') {
-      return <span className="hit-marker">X</span>;
+      return <span className={isColorBlindMode ? 'hit-marker-colorblind' : 'hit-marker'}>
+        {isColorBlindMode ? '●' : 'X'}
+      </span>;
     } else if (cell.status === 'miss') {
-      return <span className="miss-marker">X</span>;
+      return <span className={isColorBlindMode ? 'miss-marker-colorblind' : 'miss-marker'}>
+        {isColorBlindMode ? '○' : 'X'}
+      </span>;
     }
     return null;
   };
