@@ -328,16 +328,16 @@ h1 {
   padding: 12px 24px;
   font-size: 1rem;
   font-weight: 700;
-  border: 2px solid #ffffff;
+  border: 2px solid var(--text-primary);
   border-radius: 0;
   cursor: pointer;
   transition: all 0.2s;
   text-transform: uppercase;
   background: linear-gradient(135deg, #0a1a2e 0%, #051018 100%);
-  color: #ffffff;
-  text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+  color: var(--text-primary);
+  text-shadow: 0 0 5px var(--text-primary);
   box-shadow: 
-    0 0 10px rgba(255, 255, 255, 0.5),
+    0 0 10px var(--text-primary),
     inset 0 0 10px rgba(255, 255, 255, 0.1);
   font-family: 'Courier New', monospace;
   letter-spacing: 2px;
