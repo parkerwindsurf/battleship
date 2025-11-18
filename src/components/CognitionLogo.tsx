@@ -34,7 +34,7 @@ export const CognitionLogo: React.FC = () => {
           </filter>
         </defs>
         {/* Honeycomb hexagonal pattern - 1 center + 6 surrounding */}
-        <g fill="#ffffff" filter="url(#neonGlow)">
+        <g className="cognition-hexagons" filter="url(#neonGlow)">
           {/* Center hexagon */}
           <polygon points={createHexagon(center, center, hexSize)} />
           

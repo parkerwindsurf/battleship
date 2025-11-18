@@ -21,14 +21,15 @@
 }
 
 .ship-legend h3 {
-  color: var(--text-white);
+  color: var(--text-primary);
   margin-bottom: 20px;
   font-size: 2rem;
   text-align: center;
   font-weight: bold;
   text-shadow: 
-    0 0 10px rgba(255, 255, 255, 0.8),
-    0 0 20px rgba(255, 255, 255, 0.5);
+    0 0 10px var(--text-primary),
+    0 0 20px var(--text-primary),
+    0 0 30px var(--text-primary);
   text-transform: uppercase;
   letter-spacing: 3px;
 }

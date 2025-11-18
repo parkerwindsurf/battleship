@@ -452,12 +452,13 @@ h1 {
 }
 
 .board-wrapper h2 {
-  color: var(--text-white);
+  color: var(--text-primary);
   margin-bottom: 15px;
   font-size: 1.8rem;
   text-shadow: 
-    0 0 10px rgba(255, 255, 255, 0.8),
-    0 0 20px rgba(255, 255, 255, 0.5);
+    0 0 10px var(--text-primary),
+    0 0 20px var(--text-primary),
+    0 0 30px var(--text-primary);
   text-transform: uppercase;
   letter-spacing: 3px;
   font-weight: bold;
